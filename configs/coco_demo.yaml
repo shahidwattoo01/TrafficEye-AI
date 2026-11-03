@@ -1,0 +1,8 @@
+# Demo mode: run the pipeline with a stock COCO YOLO26 model before your custom model is trained.
+# Vehicles are detected and tracked; helmet/seatbelt classes do not exist in COCO, so those checks
+# stay "unknown". Use it to test zones, counting, tracking, speed and the dashboard.
+model:
+  weights: weights/yolo26n.pt
+  class_conf: {}
+classes:
+  aliases: {motorcycle: Bike, car: Car, truck: Jeep, bus: Van}

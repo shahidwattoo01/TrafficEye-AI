@@ -1,0 +1,103 @@
+# TrafficEye AI — default pipeline configuration.
+# Coordinates are in pixels of the ORIGINAL video frame.
+# Use `python scripts/draw_zones.py --source <video>` to draw zones/lines interactively.
+
+model:
+  weights: weights/trafficeye_yolo26.pt   # custom-trained 8-class model
+  imgsz: 960
+  conf: 0.35          # global confidence threshold
+  iou: 0.5            # NMS IoU threshold
+  device: ""          # "" = auto, "cpu", "0", "cuda:0"
+  half: false         # FP16 inference (GPU only)
+  # per-class confidence overrides (class name -> threshold)
+  class_conf:
+    No-Helmet: 0.40
+    No-Seatbelt: 0.40
+
+classes:
+  # index -> name, must match the trained model's data.yaml
+  names: [Bike, Car, Jeep, Van, Helmet, No-Helmet, Seatbelt, No-Seatbelt]
+  vehicles: [Bike, Car, Jeep, Van]
+  two_wheelers: [Bike]
+  four_wheelers: [Car, Jeep, Van]
+  aliases: {}                 # model name -> project name, see configs/coco_demo.yaml
+
+tracker:
+  config: configs/botsort_reid.yaml
+  # lost-vehicle relinking (re-assign a new tracker ID back to a recently lost one)
+  relink:
+    enabled: true
+    max_lost_frames: 60        # how long a lost track is remembered
+    max_center_dist: 0.08      # max centre distance as a fraction of the frame diagonal
+    min_iou: 0.05              # OR minimum IoU with the last known box
+    min_appearance_sim: 0.55   # colour-histogram similarity (0..1)
+  # anti-flicker frame-hold buffer + box smoothing
+  hold_frames: 8               # keep drawing a vehicle this many frames after it disappears
+  smoothing_alpha: 0.6         # EMA weight of the new box (1.0 = no smoothing)
+
+association:
+  # where a helmet/seatbelt box must sit inside its vehicle box
+  min_overlap: 0.5             # fraction of the helmet/seatbelt box inside the (expanded) vehicle box
+  bike_expand_top: 0.6         # riders' heads stick out above the bike box -> expand upward
+  bike_expand_side: 0.15
+  car_upper_fraction: 0.75     # seatbelts are only searched in the upper part of a car box
+
+voting:
+  window: 30                   # number of most recent observations kept per vehicle
+  min_votes: 6                 # observations required before deciding
+  violation_ratio: 0.6         # share of "violation" votes needed to flag
+  min_conf: 0.30
+
+zones:
+  # Vehicles are only judged inside these polygons. Empty list = whole frame.
+  detection:
+    - name: road
+      points: []               # e.g. [[100, 300], [1800, 300], [1900, 1060], [0, 1060]]
+
+counting:
+  enabled: true
+  # line from p1 to p2; crossing in the direction of the line's left normal = IN
+  line: []                     # e.g. [[0, 650], [1920, 650]]
+  in_label: IN
+  out_label: OUT
+
+wrong_way:
+  enabled: false
+  allowed_direction: IN        # vehicles crossing the counting line the other way are flagged
+
+speed:
+  enabled: false
+  # two parallel lines a known real-world distance apart
+  line_a: []
+  line_b: []
+  distance_m: 10.0
+  limit_kmh: 60
+
+red_light:
+  enabled: false
+  light_roi: []                # [x1, y1, x2, y2] box around the traffic signal head
+  stop_line: []                # [[x1, y1], [x2, y2]]
+  red_ratio: 0.08              # share of red pixels in ROI to call the light RED
+
+triple_riding:
+  enabled: false
+  person_weights: yolo26n.pt   # any COCO model; class 0 = person
+  max_riders: 2
+  person_conf: 0.4
+
+anpr:
+  enabled: false
+  plate_weights: weights/plate_detector.pt   # YOLO model with a single "plate" class
+  languages: [en]
+  min_conf: 0.4
+
+output:
+  dir: runs
+  save_video: true
+  save_snapshots: true
+  save_csv: true
+  save_challans: true
+  dashboard: true
+  dashboard_width: 420
+  snapshot_padding: 0.15
+  show: false                  # cv2.imshow live preview

@@ -1,0 +1,17 @@
+# TrafficEye AI dataset (YOLO format). Point `path` at your dataset root.
+#   images/train, images/val, images/test  +  labels/train, labels/val, labels/test
+path: ../datasets/trafficeye
+train: images/train
+val: images/val
+test: images/test
+
+nc: 8
+names:
+  0: Bike
+  1: Car
+  2: Jeep
+  3: Van
+  4: Helmet
+  5: No-Helmet
+  6: Seatbelt
+  7: No-Seatbelt

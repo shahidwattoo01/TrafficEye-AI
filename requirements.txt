@@ -1,0 +1,9 @@
+ultralytics>=8.4.0      # YOLO26 + BoT-SORT tracking
+opencv-python>=4.9
+numpy>=1.26
+pandas>=2.1
+PyYAML>=6.0
+lap>=0.5.12             # linear assignment used by the trackers
+streamlit>=1.40         # web control panel
+easyocr>=1.7            # optional: number plate recognition
+pytest>=8.0

@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+runs/
+weights/*.pt
+weights/*.onnx
+data/videos/*
+!data/videos/.gitkeep
+.pytest_cache/
