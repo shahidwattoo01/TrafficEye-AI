@@ -35,7 +35,7 @@ with st.sidebar:
     site_cfg = st.text_input("Site config YAML (optional)", "")
 
     st.header("Model")
-    weights = st.text_input("Weights", "weights/trafficeye_yolo26.pt")
+    weights = st.text_input("Weights", "weights/yolo26n.pt")
     conf = st.slider("Confidence", 0.05, 0.95, 0.35, 0.05)
     imgsz = st.select_slider("Image size", [640, 768, 960, 1280], 960)
     device = st.selectbox("Device", ["auto", "cpu", "0"])

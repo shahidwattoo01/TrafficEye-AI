@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 runs/
 weights/*.pt
+!weights/yolo26n.pt
 weights/*.onnx
 data/videos/*
 !data/videos/.gitkeep
